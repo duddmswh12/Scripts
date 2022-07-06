@@ -1,0 +1,184 @@
+rm(list=ls())
+library(ComplexHeatmap)
+
+setwd('F:/TCGAdata/')
+
+col = c(missense_variant = "#377eb8", frameshift_variant = "#ff7f00",stop_lost = "#ffff33", protein_protein_contact = "#8dd3c7", 
+        Nonsense_mutation = "#e41a1c", inframe_deletion = "#4daf4a", 
+        inframe_insertion = "#33CC33", disruptive_inframe_deletion = "#006666",
+        disruptive_inframe_insertion = "#b3de69", sequence_feature = "#FF7DA8",
+        splice_region_variant = "#984ea3", intron_variant = "#984ea3")
+
+alter_fun = list( 
+  background = function(x, y, w, h) {
+    grid.rect(x, y, w-unit(0.5, "mm"), h-unit(0.5, "mm"), gp = gpar(fill = "#d7d7d7", col = NA))
+  },
+  missense_variant = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.9, gp = gpar(fill = "#377eb8", col = NA))
+  },
+  frameshift_variant = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.5, gp = gpar(fill = "#ff7f00", col = NA))
+  },
+  stop_lost = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.5, gp = gpar(fill = "#ffff33", col = NA))
+  },
+  protein_protein_contact = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.2, gp = gpar(fill = "#8dd3c7", col = NA))
+  },
+  Nonsense_mutation = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.5, gp = gpar(fill = "#e41a1c", col = NA))
+  },
+  inframe_deletion = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.3, gp = gpar(fill = "#4daf4a", col = NA))
+  },
+  inframe_insertion = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.3, gp = gpar(fill = "#33CC33", col = NA))
+  },
+  disruptive_inframe_deletion = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.3, gp = gpar(fill = "#006666", col = NA))
+  },
+  disruptive_inframe_insertion = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.3, gp = gpar(fill = "#b3de69", col = NA))
+  },
+  sequence_feature = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.2, gp = gpar(fill = "#FF7DA8", col = NA))
+  },
+  splice_region_variant = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.2, gp = gpar(fill = "#984ea3", col = NA))
+  },
+  intron_variant = function(x, y, w, h) {
+    grid.rect(x, y, w*0.9, h*0.2, gp = gpar(fill = "#984ea3", col = NA))
+  }
+)
+heatmap_legend_param = 
+  list(title = "Alternations", at = c("missense_variant", "frameshift_variant",
+                                      "stop_lost", "protein_protein_contact",
+                                      "Nonsense_mutation", "inframe_deletion",
+                                      "inframe_insertion","sequence_feature",
+                                      "splice_region_variant",
+                                      "disruptive_inframe_deletion",
+                                      "disruptive_inframe_insertion","intron_variant"), labels = c("SNV", "Frame_shift", "Stop_Lost","Protein_Protein_Interaction",
+                                                                                                   "Nonsense-mutation", "In_Frame_Del","In_Frame_Ins",
+                                                                                                   "Amino Acids Modification", "Splice region-variant","In_Frame_Del",
+                                                                                                   "In_Frame_Ins","Intron-variant"),
+       title_gp=gpar(fontsize=12, fontface="bold"), labels_gp=gpar(fontsize=11))
+
+
+raw1 <- read.csv("Total_Input.csv", stringsAsFactors = F, header = T)  #csv로 읽어오기
+raw1[is.na(raw1)] = ""
+row.names(raw1) <- raw1$X
+raw1<-raw1[,2:ncol(raw1)]
+raw1 = as.matrix(raw1)
+
+
+
+
+
+
+subcha1 <- scan("F:/TCGAdata/CCLE_subtype.txt", what = "character", fill = F)
+subcha2 <- scan("F:/TCGAdata/TCGA_subtype.txt", what = "character", fill = F)
+subcha3 <- scan("F:/TCGAdata/subtype.txt", what = "character", fill = F)
+
+
+
+col_subype = c("Myxofibrosarcoma" = "#3F51B5",
+               "UndifferentiatedPleomorphicSarcoma" = "#FFEB3B",
+               "SynovialSarcoma" = "#FF8F00","Chondrosarcoma" = "#4CAF50",
+               "DesmoplasticSmallRoundCellTumor" = "#F44336",
+               "PleomorphicLiposarcoma" = "#00BCD4",
+               "Osteosarcoma" = "#9C27B0", "Fibrosarcoma" = "#AED581")
+
+subtype1 <- HeatmapAnnotation(Subtype = subcha1, col = list(Subtype = col_subype),
+                              annotation_legend_param = 
+                                list(at = c("Myxofibrosarcoma",
+                                            "UndifferentiatedPleomorphicSarcoma",
+                                            "SynovialSarcoma","Chondrosarcoma",
+                                            "DesmoplasticSmallRoundCellTumor",
+                                            "PleomorphicLiposarcoma",
+                                            "Osteosarcoma", "Fibrosarcoma"), labels = c(
+                                              "Myxofibrosarcoma",
+                                              "Undifferentiated Pleomorphic Sarcoma",
+                                              "Synovial Sarcoma", "Chondrosarcoma",
+                                              "Desmoplastic Small Round Cell Tumor",
+                                              "Pleomorphic Liposarcoma",
+                                              "Osteosarcoma","Fibrosarcoma"), nrow = 2),
+                              show_annotation_name = F)
+
+subtype2 <- HeatmapAnnotation(Subtype = subcha2, col = list(Subtype = col_subype),
+                              annotation_legend_param = 
+                                list(at = c("Myxofibrosarcoma",
+                                            "UndifferentiatedPleomorphicSarcoma",
+                                            "SynovialSarcoma","Chondrosarcoma",
+                                            "DesmoplasticSmallRoundCellTumor",
+                                            "PleomorphicLiposarcoma",
+                                            "Osteosarcoma", "Fibrosarcoma"), labels = c(
+                                              "Myxofibrosarcoma",
+                                              "Undifferentiated Pleomorphic Sarcoma",
+                                              "Synovial Sarcoma", "Chondrosarcoma",
+                                              "Desmoplastic Small Round Cell Tumor",
+                                              "Pleomorphic Liposarcoma",
+                                              "Osteosarcoma","Fibrosarcoma"), nrow = 2),
+                              show_annotation_name = F)
+subtype3 <- HeatmapAnnotation(Subtype = subcha3, col = list(Subtype = col_subype),
+                              annotation_legend_param = 
+                                list(at = c("Myxofibrosarcoma",
+                                            "UndifferentiatedPleomorphicSarcoma",
+                                            "SynovialSarcoma","Chondrosarcoma",
+                                            "DesmoplasticSmallRoundCellTumor",
+                                            "PleomorphicLiposarcoma",
+                                            "Osteosarcoma", "Fibrosarcoma"), labels = c(
+                                              "Myxofibrosarcoma",
+                                              "Undifferentiated Pleomorphic Sarcoma",
+                                              "Synovial Sarcoma", "Chondrosarcoma",
+                                              "Desmoplastic Small Round Cell Tumor",
+                                              "Pleomorphic Liposarcoma",
+                                              "Osteosarcoma","Fibrosarcoma"), nrow = 2),
+                              show_annotation_name = F)
+
+
+sample_order = scan("F:/Oncoplot/Order.txt", what = "character", fill = F)
+
+is.na(sample_order)
+
+matTis <- c("5373","Cell","Cell","Cell","6217","6218","6219","6219","6219","6246",
+            "6246","6349","Cell","6380","6766","Cell","Normal","Normal","5373",
+            "6217","6218","6219","6246","6349","6380","6766")
+
+
+
+column_title1 = "CCLE"
+column_title2 = "TCGA-SARC"
+column_title3 = "SNU Sarcoma Cell Line"
+
+
+
+Onco1 <- oncoPrint(raw1[,16:60], alter_fun = alter_fun, col = col, 
+                   remove_empty_rows = F,
+                   remove_empty_columns = FALSE,show_column_names = FALSE,
+                   show_row_names = T, row_order = NULL, column_title = column_title2,
+                   column_title_gp = gpar(fontface = "bold", fontsize = 15),
+                   heatmap_legend_param = heatmap_legend_param, 
+                   bottom_annotation = subtype2) +
+  oncoPrint(raw1[,1:15], alter_fun = alter_fun, col = col, remove_empty_rows = F,
+                   remove_empty_columns = FALSE,show_column_names = FALSE,
+                   show_row_names = T, row_order = NULL,column_title = column_title1,
+                   column_title_gp = gpar(fontface = "bold", fontsize = 15),
+                   heatmap_legend_param = heatmap_legend_param, 
+                   bottom_annotation = subtype1) + 
+  oncoPrint(raw1[,61:86], alter_fun = alter_fun, col = col, remove_empty_rows = F,
+            remove_empty_columns = FALSE,show_column_names = TRUE,
+            show_row_names = T, row_order = NULL, column_title = column_title3,
+            column_title_gp = gpar(fontface = "bold", fontsize = 15),
+            heatmap_legend_param = heatmap_legend_param,
+            column_order = sample_order,
+            column_split = matTis, 
+            column_gap = unit(c(1, 4, 1, 1, 1, 1, 1, 4, 4), "mm"),
+            bottom_annotation = subtype3)
+
+
+
+
+draw(Onco1, annotation_legend_side= "bottom")
+
+dev.copy(tiff,"Merged_oncoplot_with_PublicData_fontsize_220614.tiff",width=20, height=10, units="in",res=200) 
+dev.off()  
